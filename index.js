@@ -1,17 +1,20 @@
 const express = require("express");
+const multer = require("multer");
 const fs = require("fs");
 const PizZip = require("pizzip");
 const Docxtemplater = require("docxtemplater");
 
+const upload = multer({ storage: multer.memoryStorage() }); // store uploaded file in memory
+
 const app = express();
 app.use(express.json());
 
-app.post("/generate", (req, res) => {
+app.post("/generate", upload.single("template"), (req, res) => {
   try {
-    const data = req.body; // JSON with your variables
+    const data = JSON.parse(req.body.data); // send JSON data as a text field named "data"
+    const templateBuffer = req.file.buffer; // the uploaded DOCX template
 
-    const content = fs.readFileSync("./template.docx", "binary");
-    const zip = new PizZip(content);
+    const zip = new PizZip(templateBuffer);
     const doc = new Docxtemplater(zip);
 
     doc.setData(data);
