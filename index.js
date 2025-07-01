@@ -3,6 +3,8 @@ const multer = require("multer");
 const fs = require("fs");
 const PizZip = require("pizzip");
 const Docxtemplater = require("docxtemplater");
+// Import the angular-expressions parser
+const angularParser = require("docxtemplater/expressions.js");
 
 const upload = multer({ storage: multer.memoryStorage() }); // store uploaded file in memory
 
@@ -15,9 +17,10 @@ app.post("/generate", upload.single("template"), (req, res) => {
     const templateBuffer = req.file.buffer; // the uploaded DOCX template
 
     const zip = new PizZip(templateBuffer);
-    const doc = new Docxtemplater(zip);
+    const doc = new Docxtemplater(zip, {
+      parser: angularParser, // ✅ important: enables support for complex expressions
+    });
 
-    //doc.setData(data); deprecated
     doc.render(data);
 
     const buf = doc.getZip().generate({ type: "nodebuffer" });
