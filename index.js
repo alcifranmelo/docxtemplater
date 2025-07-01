@@ -17,8 +17,8 @@ app.post("/generate", upload.single("template"), (req, res) => {
     const zip = new PizZip(templateBuffer);
     const doc = new Docxtemplater(zip);
 
-    doc.setData(data);
-    doc.render();
+    //doc.setData(data); deprecated
+    doc.render(data);
 
     const buf = doc.getZip().generate({ type: "nodebuffer" });
     res.set({
